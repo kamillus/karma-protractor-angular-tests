@@ -8,7 +8,7 @@ describe('Unit Test: UserService ', function() {
 	
 	beforeEach(angular.mock.module('appControllers'))
 	beforeEach(angular.mock.module('appServices'))
-	beforeEach(angular.mock.module('startApp'))
+	beforeEach(angular.mock.module('videoPlayerApp'))
 	beforeEach(angular.mock.module('angularytics'))
 
 	beforeEach(inject(function($rootScope, $injector, _$httpBackend_, _$q_){
@@ -24,11 +24,11 @@ describe('Unit Test: UserService ', function() {
 	});
 
 	it('Returns signup information when user not logged in but is signed up', inject(function($rootScope, $controller, $location, $injector) {
-		$httpBackend.whenGET('/api/user/check').respond(
+		$httpBackend.whenGET('/user/status').respond(
 			{"loggedIn":false,"signedUp":true}
 		);
 		
-		$httpBackend.expectGET('/api/user/check');
+		$httpBackend.expectGET('/user/status');
 		userService.check(function(data){	
 		})
 		$httpBackend.flush();
@@ -38,11 +38,11 @@ describe('Unit Test: UserService ', function() {
 	
 
 	it('Returns signup information when user is not signed up and not logged in', inject(function($rootScope, $controller, $location, $injector) {
-		$httpBackend.whenGET('/api/user/check').respond(
+		$httpBackend.whenGET('/user/status').respond(
 			{"loggedIn":false,"signedUp":false}
 		);
 		
-		$httpBackend.expectGET('/api/user/check');
+		$httpBackend.expectGET('/user/status');
 		userService.check(function(data){	
 		})
 		$httpBackend.flush();
@@ -52,15 +52,15 @@ describe('Unit Test: UserService ', function() {
 	}));
 
 	it('User able to login', inject(function($rootScope, $controller, $location, $injector) {
-		$httpBackend.whenGET('/api/user/check').respond(
+		$httpBackend.whenGET('/user/status').respond(
 			{"loggedIn":true,"signedUp":true}
 		);	
 		
-		$httpBackend.whenPOST('/api/user/get').respond(
-			{"status":1,"error":"","output":{"credits":"1"},"credits":0,"loginData":{"worked":true,"data":{"success":true,"message":"''","errorCode":0,"tag":{"authenticated":true,"message":"User Logged In","user":{"userId":"117","emailAddress":"test26@graboid.com","lastName":"","firstName":"","username":"","dateCreated":"2014-09-03 14:43:39","adultEnabled":"0","emailVerified":"1","isAdultClient":"0","poolId":"2","password":"ac8b260984e97d145556ba9a34743789","version":"","versionOriginal":"","versionModifier":"","testAccount":"1","remoteCountry":"ZZ","remoteIP":"192.168.0.168","emptyCol":"0","splitTestId":"","oauth":"0","userSubscription":{"userSubscriptionId":-1,"userId":"117","subscriptionPlanId":null,"paymentManifestId":null,"status":null,"cancelled":null,"startDate":null,"endDate":null,"changeDate":null,"registrationMarker":null,"paid":0,"subscriptionPlan":{"isExpired":0}}}}}},"hash":"ac8b260984e97d145556ba9a34743789"}
+		$httpBackend.whenPOST('/user').respond(
+			{"status":1,"error":"","credits":0,"loginData":{"worked":true,"data":{"success":true,"message":"''","errorCode":0,"tag":{"authenticated":true,"message":"User Logged In","user":{"userId":"1","emailAddress":"test1324783@mailinator.com","lastName":"","firstName":"","username":"","createdAt":"2014-09-03 14:43:39"}}}}}		);
 		);
 		
-		$httpBackend.expectPOST('/api/user/get');
+		$httpBackend.expectPOST('/user');
 		userService.login(true, function(){});
 		$httpBackend.flush();
 		expect(userService.showSignUp).toBe(false);
@@ -71,36 +71,36 @@ describe('Unit Test: UserService ', function() {
 
 
 	it('Returns signup information when user is logged in', inject(function($rootScope, $controller, $location, $injector) {
-		$httpBackend.whenGET('/api/user/check').respond(
-			{"email":"test26@graboid.com","password":"ac8b260984e97d145556ba9a34743789","loggedIn":true}
+		$httpBackend.whenGET('/user/status').respond(
+			{"email":"test1324783@mailinator.com","password":"somehash","loggedIn":true}
 		);
 		
-		$httpBackend.whenPOST('/api/user/get').respond(
+		$httpBackend.whenPOST('/user').respond(
 			{"loggedIn":true,"signedUp":true}
 		);
 		
-		$httpBackend.expectGET('/api/user/check');
-		$httpBackend.expectPOST('/api/user/get');
+		$httpBackend.expectGET('/user/status');
+		$httpBackend.expectPOST('/user');
 		userService.check(function(data){	
 		})
 		$httpBackend.flush();
 		expect(userService.showSignUp).toBe(false);
-		expect(userService.email).toMatch("test26@graboid.com");	
+		expect(userService.email).toMatch("test1324783@mailinator.com");	
 	}));
 	
 	
 	it('Logs out and redirects the user', inject(function(_$location_, $rootScope, $controller, $location, $injector) {
-		$httpBackend.whenGET('/api/user/logout').respond(
+		$httpBackend.whenGET('/user/logout').respond(
 			{"logout":true}
 		);
 		
-		$httpBackend.whenGET('/api/user/check').respond(
+		$httpBackend.whenGET('/user/status').respond(
 			{"loggedIn":false,"signedUp":true}
 		);
 		
 		spyOn($location, 'path');
-		$httpBackend.expectGET('/api/user/check');
-		$httpBackend.expectGET('/api/user/logout');
+		$httpBackend.expectGET('/user/status');
+		$httpBackend.expectGET('/user/logout');
 		userService.logout();
 		$httpBackend.flush();
 		expect(userService.showSignUp).toBe(false);
@@ -110,24 +110,13 @@ describe('Unit Test: UserService ', function() {
 		expect($location.path).toHaveBeenCalled();
 	}));
 	
-	it('Redirects to bmember on upgrade', inject(function($rootScope, $controller, $location, $injector) {
-		$httpBackend.whenGET('/api/user/check').respond(
+	it('Redirects to payment system on upgrade', inject(function($rootScope, $controller, $location, $injector) {
+		$httpBackend.whenGET('/user/status').respond(
 			{"loggedIn":false,"signedUp":true}
 		);
-		$httpBackend.expectGET('/api/user/check');
+		$httpBackend.expectGET('/user/status');
 		spyOn(userService, "redirect");
 		userService.upgrade()
-		$httpBackend.flush();
-		expect(userService.redirect).toHaveBeenCalled();
-	}));
-	
-	it('Redirects to bmember on manage', inject(function($rootScope, $controller, $location, $injector) {
-		$httpBackend.whenGET('/api/user/check').respond(
-			{"loggedIn":false,"signedUp":true}
-		);
-		$httpBackend.expectGET('/api/user/check');
-		spyOn(userService, "redirect");
-		userService.manage()
 		$httpBackend.flush();
 		expect(userService.redirect).toHaveBeenCalled();
 	}));						

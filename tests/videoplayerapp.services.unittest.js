@@ -23,31 +23,31 @@ describe('Unit Test: Video Player App Services ', function() {
 		videoService = $injector.get(['VideoService']);	
 		
 		
-		$httpBackend.whenGET('/api/search/count/50/offset/0/category/0/orderBy/-1/order/desc/genre/0').respond(
+		$httpBackend.whenGET('/search/count/50/offset/0/category/0/orderBy/-1/order/desc/genre/0').respond(
 			{"search_results":[{"title":"Test Title","likes":"0","views":"0","date":"1392849608", "category":"1"}],"meta":{"count":"1"}}		
 		);
 		
-		$httpBackend.whenGET('/api/search/count/50/offset/50/category/0/orderBy/-1/order/desc/genre/0').respond(
+		$httpBackend.whenGET('/search/count/50/offset/50/category/0/orderBy/-1/order/desc/genre/0').respond(
 			{"search_results":[{"title":"Test Title 3","likes":"0","views":"0","date":"1392849608", "category":"2"}],"meta":{"count":"1"}}		
 		);
 		
-		$httpBackend.whenGET('/api/search/count/50/offset/0/category/1/orderBy/-1/order/desc/genre/0').respond(
+		$httpBackend.whenGET('/search/count/50/offset/0/category/1/orderBy/-1/order/desc/genre/0').respond(
 			{"search_results":[{"title":"Test Title 4","likes":"0","views":"0","date":"1392849608", "category":"1"}],"meta":{"count":"1"}}		
 		);
 
-		$httpBackend.whenGET('/api/search/count/50/offset/0/category/0/orderBy/3/order/desc/genre/0').respond(
+		$httpBackend.whenGET('/search/count/50/offset/0/category/0/orderBy/3/order/desc/genre/0').respond(
 			{"search_results":[{"title":"Test Title 5","likes":"0","views":"0","date":"1392849608", "category":"1"}],"meta":{"count":"1"}}		
 		);
 		
-		$httpBackend.whenGET('/api/search/count/50/offset/0/category/0/orderBy/3/order/asc/genre/0').respond(
-			$httpBackend.whenGET('/api/search/count/50/offset/0/category/0/orderBy/-1/order/desc/genre/0').respond(
+		$httpBackend.whenGET('/search/count/50/offset/0/category/0/orderBy/3/order/asc/genre/0').respond(
+			$httpBackend.whenGET('/search/count/50/offset/0/category/0/orderBy/-1/order/desc/genre/0').respond(
 		);
 
-		$httpBackend.whenGET('/api/user').respond(
+		$httpBackend.whenGET('/user').respond(
 			{"loggedIn":false,"signedUp":false}
 		);
 		
-		$httpBackend.whenGET('/api/genres').respond(
+		$httpBackend.whenGET('/genres').respond(
 			'200', ''
 		);
 	}));
@@ -59,7 +59,7 @@ describe('Unit Test: Video Player App Services ', function() {
 	
 	it('Should have results', inject(function($rootScope, $controller, $location, $injector) {
 
-		$httpBackend.expectGET('/api/search/count/50/offset/0/category/0/orderBy/-1/order/desc/genre/0'); 
+		$httpBackend.expectGET('/search/count/50/offset/0/category/0/orderBy/-1/order/desc/genre/0'); 
 		
 		videoService.getSearchResults().then(function(data){})	
 		$httpBackend.flush();
@@ -72,12 +72,12 @@ describe('Unit Test: Video Player App Services ', function() {
 		videoService.getSearchResults().then(function(data){})	
 		$httpBackend.flush();
 
-		$httpBackend.expectGET('/api/search/count/50/offset/50/category/0/orderBy/-1/order/desc/genre/0');
+		$httpBackend.expectGET('/search/count/50/offset/50/category/0/orderBy/-1/order/desc/genre/0');
 		videoService.nextPage();
 		$httpBackend.flush();
 		expect(videoService.page).toEqual(1);
 		
-		$httpBackend.expectGET('/api/search/count/50/offset/0/category/0/orderBy/-1/order/desc/genre/0');
+		$httpBackend.expectGET('/search/count/50/offset/0/category/0/orderBy/-1/order/desc/genre/0');
 		videoService.previousPage();
 		$httpBackend.flush();
 		expect(videoService.page).toEqual(0);
@@ -87,7 +87,7 @@ describe('Unit Test: Video Player App Services ', function() {
 		videoService.getSearchResults().then(function(data){})	
 		$httpBackend.flush();
 
-		$httpBackend.expectGET('/api/search/count/50/offset/0/category/1/orderBy/-1/order/desc/genre/0');
+		$httpBackend.expectGET('/search/count/50/offset/0/category/1/orderBy/-1/order/desc/genre/0');
 		videoService.change_category(1);
 		$httpBackend.flush();
 		
@@ -99,13 +99,13 @@ describe('Unit Test: Video Player App Services ', function() {
 		videoService.getSearchResults().then(function(data){})	
 		$httpBackend.flush();
 
-		$httpBackend.expectGET('/api/search/count/50/offset/0/category/0/orderBy/3/order/desc/genre/0');
+		$httpBackend.expectGET('/search/count/50/offset/0/category/0/orderBy/3/order/desc/genre/0');
 		videoService.change_order_by(3)
 		$httpBackend.flush();
 		expect(videoService.orderDirection).toEqual('desc')
 		expect(videoService.page).toEqual(0);
 		
-		$httpBackend.expectGET('/api/search/count/50/offset/0/category/0/orderBy/3/order/asc/genre/0');
+		$httpBackend.expectGET('/search/count/50/offset/0/category/0/orderBy/3/order/asc/genre/0');
 		videoService.change_order_by(3)
 		$httpBackend.flush();
 		expect(videoService.orderDirection).toEqual('asc')
@@ -119,10 +119,10 @@ describe('Unit Test: Video Player App Services ', function() {
 	}));
 	
 	it('Should show correct modal when a user who is not logged in tries to download', inject(function($rootScope, $controller, $location, $injector) {
-		$httpBackend.whenPOST('/api/watch/1').respond(
+		$httpBackend.whenPOST('/watch/1').respond(
 			{"status":0,"title":"Title 4","message":"You need to be logged in to view videos"}
 		);		
-		$httpBackend.expectPOST('/api/watch/1');
+		$httpBackend.expectPOST('/watch/1');
 		spyOn(videoService, "show_modal");
 		videoService.watch("1")
 		$httpBackend.flush();
